@@ -1,0 +1,28 @@
+{
+  "name": "@kairox/api",
+  "type": "module",
+  "exports": {
+    ".": {
+      "default": "./src/index.ts"
+    },
+    "./*": {
+      "default": "./src/*.ts"
+    }
+  },
+  "scripts": {},
+  "dependencies": {
+    "@orpc/server": "catalog:",
+    "@orpc/client": "catalog:",
+    "@orpc/openapi": "catalog:",
+    "@orpc/zod": "catalog:",
+    "hono": "catalog:",
+    "dotenv": "catalog:",
+    "zod": "catalog:",
+    "@kairox/auth": "workspace:*",
+    "@kairox/db": "workspace:*"
+  },
+  "devDependencies": {
+    "typescript": "catalog:",
+    "@kairox/config": "workspace:*"
+  }
+}
