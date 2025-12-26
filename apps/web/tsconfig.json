@@ -8,11 +8,12 @@
     "moduleResolution": "Bundler",
     "verbatimModuleSyntax": true,
     "skipLibCheck": true,
-    "types": ["vite/client"],
+    "types": ["vite/client", "vite-plugin-svg-sprite/typings/react"],
     "rootDirs": ["."],
-    "baseUrl": ".",
     "paths": {
-      "@/*": ["./src/*"]
+      "@icons/*": ["./src/components/icons/*"],
+      "@ui/*": ["./src/components/ui/*"],
+      "@/*": ["./src/*"],
     }
   }
 }

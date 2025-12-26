@@ -1,3 +1,4 @@
+import type { LoggerContext } from "@orpc/experimental-pino";
 import type { Context as HonoContext } from "hono";
 
 import { auth } from "@kairox/auth";
@@ -15,4 +16,4 @@ export async function createContext({ context }: CreateContextOptions) {
   };
 }
 
-export type Context = Awaited<ReturnType<typeof createContext>>;
+export type Context = Awaited<ReturnType<typeof createContext>> & LoggerContext;

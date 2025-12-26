@@ -1,25 +1,28 @@
 import tailwindcss from "@tailwindcss/vite";
 import { tanstackRouter } from "@tanstack/router-plugin/vite";
 import react from "@vitejs/plugin-react";
-import path from "node:path";
 import { defineConfig } from "vite";
+import tsconfigPaths from "vite-tsconfig-paths";
+import createSvgSpritePlugin from "vite-plugin-svg-sprite";
 
 export default defineConfig({
   plugins: [
     tailwindcss(),
-    tanstackRouter({}),
+    tsconfigPaths(),
+    tanstackRouter({
+      routeToken: "layout",
+      indexToken: "page",
+    }),
     react({
       babel: {
         plugins: ["babel-plugin-react-compiler"],
       },
     }),
+    createSvgSpritePlugin({
+      exportType: "react",
+      include: "**/components/icons/*.svg",
+    }),
   ],
-  resolve: {
-    alias: {
-      "@": path.resolve(__dirname, "./src"),
-      "@ui": path.resolve(__dirname, "./src/components/ui"),
-    },
-  },
   server: {
     port: 3001,
     host: true,

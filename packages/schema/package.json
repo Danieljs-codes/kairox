@@ -1,0 +1,20 @@
+{
+  "name": "@kairox/schema",
+  "type": "module",
+  "exports": {
+    ".": {
+      "default": "./src/index.ts"
+    },
+    "./*": {
+      "default": "./src/*.ts"
+    }
+  },
+  "scripts": {},
+  "devDependencies": {
+    "typescript": "catalog:",
+    "@kairox/config": "workspace:*"
+  },
+  "dependencies": {
+    "zod": "catalog:"
+  }
+}

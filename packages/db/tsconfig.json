@@ -1,5 +1,6 @@
 {
   "extends": "@kairox/config/tsconfig.base.json",
+  "include": ["src"],
   "compilerOptions": {
     "declaration": true,
     "declarationMap": true,

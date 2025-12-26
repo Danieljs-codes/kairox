@@ -1,5 +1,17 @@
-import { drizzle } from "drizzle-orm/node-postgres";
+import { relations } from './schema';
+import { remember } from '@epic-web/remember';
+import { drizzle } from 'drizzle-orm/bun-sql';
 
-import * as schema from "./schema";
+// Lazy initialization to ensure env vars are loaded before db connection
+function initializeDb() {
+  return remember('db', () => {
+    const dbUrl = process.env.DATABASE_URL || '';
 
-export const db = drizzle(process.env.DATABASE_URL || "", { schema });
+    return drizzle(dbUrl, { relations, logger: true });
+  });
+}
+
+// Direct export with lazy initialization on first access
+export const db = initializeDb();
+
+export type DB = typeof db;

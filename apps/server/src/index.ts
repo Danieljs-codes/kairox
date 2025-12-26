@@ -1,78 +1,77 @@
-import "dotenv/config";
-import { createContext } from "@kairox/api/context";
-import { appRouter } from "@kairox/api/routers/index";
-import { auth } from "@kairox/auth";
-import { OpenAPIHandler } from "@orpc/openapi/fetch";
-import { OpenAPIReferencePlugin } from "@orpc/openapi/plugins";
-import { onError } from "@orpc/server";
-import { RPCHandler } from "@orpc/server/fetch";
-import { ZodToJsonSchemaConverter } from "@orpc/zod/zod4";
-import { Hono } from "hono";
-import { cors } from "hono/cors";
-import { logger } from "hono/logger";
+import 'dotenv/config';
+import { createContext } from '@kairox/api/context';
+import { appRouter } from '@kairox/api/routers/index';
+import { auth } from '@kairox/auth';
+import { LoggingHandlerPlugin } from '@orpc/experimental-pino';
+import { onError } from '@orpc/server';
+import { RPCHandler } from '@orpc/server/fetch';
+import { CompressionPlugin } from '@orpc/server/fetch';
+import { Hono } from 'hono';
+import { cors } from 'hono/cors';
+import pino from 'pino';
 
 const app = new Hono();
 
-app.use(logger());
+const pinoLogger = pino({
+	transport:
+		process.env.NODE_ENV === 'development'
+			? {
+					target: 'pino-pretty',
+					options: {
+						colorize: true,
+						translateTime: 'HH:MM:ss Z',
+					},
+				}
+			: undefined,
+});
+
 app.use(
-  "/*",
-  cors({
-    origin: process.env.CORS_ORIGIN || "",
-    allowMethods: ["GET", "POST", "OPTIONS"],
-    allowHeaders: ["Content-Type", "Authorization"],
-    credentials: true,
-  }),
+	'/*',
+	cors({
+		origin: (process.env.CORS_ORIGIN ?? '').split(','),
+		allowMethods: ['GET', 'HEAD', 'PUT', 'POST', 'DELETE', 'PATCH'],
+		allowHeaders: ['Content-Type', 'Authorization'],
+		credentials: true,
+	}),
 );
 
-app.on(["POST", "GET"], "/api/auth/*", (c) => auth.handler(c.req.raw));
-
-export const apiHandler = new OpenAPIHandler(appRouter, {
-  plugins: [
-    new OpenAPIReferencePlugin({
-      schemaConverters: [new ZodToJsonSchemaConverter()],
-    }),
-  ],
-  interceptors: [
-    onError((error) => {
-      console.error(error);
-    }),
-  ],
-});
+app.on(['POST', 'GET'], '/api/auth/*', (c) => auth.handler(c.req.raw));
 
 export const rpcHandler = new RPCHandler(appRouter, {
-  interceptors: [
-    onError((error) => {
-      console.error(error);
-    }),
-  ],
+	interceptors: [
+		onError((error) => {
+			pinoLogger.error(error);
+		}),
+	],
+	plugins: [
+		new LoggingHandlerPlugin({
+			logger: pinoLogger,
+			generateId: () => Bun.randomUUIDv7(),
+			logRequestResponse: true,
+			logRequestAbort: true,
+		}),
+		new CompressionPlugin(),
+	],
 });
 
-app.use("/*", async (c, next) => {
-  const context = await createContext({ context: c });
+app.use('/*', async (c, next) => {
+	const context = await createContext({ context: c });
 
-  const rpcResult = await rpcHandler.handle(c.req.raw, {
-    prefix: "/rpc",
-    context: context,
-  });
+	const { matched, response } = await rpcHandler.handle(c.req.raw, {
+		prefix: '/rpc',
+		context: context,
+	});
 
-  if (rpcResult.matched) {
-    return c.newResponse(rpcResult.response.body, rpcResult.response);
-  }
+	if (matched) {
+		// @ts-expect-error - Copied directly from orpc docs
+		return c.newResponse(response.body, response);
+	}
 
-  const apiResult = await apiHandler.handle(c.req.raw, {
-    prefix: "/api-reference",
-    context: context,
-  });
-
-  if (apiResult.matched) {
-    return c.newResponse(apiResult.response.body, apiResult.response);
-  }
-
-  await next();
+	await next();
 });
 
-app.get("/", (c) => {
-  return c.text("OK");
+app.get('/', (c) => {
+	return c.text('OK');
 });
 
 export default app;
