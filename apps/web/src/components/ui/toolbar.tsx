@@ -8,7 +8,7 @@ function Toolbar({ className, ...props }: ToolbarPrimitive.Root.Props) {
 	return (
 		<ToolbarPrimitive.Root
 			className={cn(
-				'relative flex gap-2 rounded-xl border bg-card bg-clip-padding p-1 text-card-foreground',
+				'relative flex flex-wrap gap-2 rounded-xl border bg-card bg-clip-padding p-1 text-card-foreground max-w-full',
 				className,
 			)}
 			data-slot="toolbar"
@@ -54,4 +54,4 @@ function ToolbarSeparator({ className, ...props }: ToolbarPrimitive.Separator.Pr
 	);
 }
 
-export { Toolbar, ToolbarGroup, ToolbarSeparator, ToolbarButton, ToolbarLink, ToolbarInput };
+export { Toolbar, ToolbarButton, ToolbarGroup, ToolbarInput, ToolbarLink, ToolbarSeparator };

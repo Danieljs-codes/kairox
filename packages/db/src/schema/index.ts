@@ -167,11 +167,11 @@ export const event = pgTable(
 		slug: text('slug').notNull(),
 		description: text('description'),
 		// Venue details
-		address: text('venue_address'),
+		address: text('venue_address').notNull(),
 		// Event timing
-		startDate: timestamp('start_date'),
-		endDate: timestamp('end_date'),
-		timezone: text('timezone'),
+		startDate: timestamp('start_date').notNull(),
+		endDate: timestamp('end_date').notNull(),
+		timezone: text('timezone').notNull(),
 		// Fee configuration (event-wide)
 		feeBearer: feeBearerEnum('fee_bearer').default('CUSTOMER').notNull(),
 		// Status

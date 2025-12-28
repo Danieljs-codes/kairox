@@ -496,3 +496,6 @@ packages/
 - Components in `@ui/*` alias for `@/components/ui/*`
 - Variants using class-variance-authority (cva)
 - Icons imported as SVG files from `@icons/*` alias
+
+### Error Messages
+All error messages should be as descriptive and as concise as possible. 

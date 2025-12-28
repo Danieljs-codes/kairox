@@ -1,6 +1,7 @@
 @import url('./fonts/inter.css');
 @import 'tailwindcss';
 @import 'tw-animate-css';
+@plugin "@tailwindcss/typography";
 
 @custom-variant dark (&:is(.dark *));
 
@@ -250,16 +251,16 @@ body {
 			padding-inline-start: 0.25rem;
 		}
 
-		li > p {
+		li>p {
 			margin-top: 0.5rem;
 			margin-bottom: 0.5rem;
 		}
 
-		li > p:first-child {
+		li>p:first-child {
 			margin-top: 0;
 		}
 
-		li > p:last-child {
+		li>p:last-child {
 			margin-bottom: 0;
 		}
 
@@ -272,13 +273,13 @@ body {
 		}
 
 		/* Reduce margins for first/last list elements */
-		> ul:first-child,
-		> ol:first-child {
+		>ul:first-child,
+		>ol:first-child {
 			margin-top: 0;
 		}
 
-		> ul:last-child,
-		> ol:last-child {
+		>ul:last-child,
+		>ol:last-child {
 			margin-bottom: 0;
 		}
 
