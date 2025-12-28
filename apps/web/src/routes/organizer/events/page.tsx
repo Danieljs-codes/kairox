@@ -1,12 +1,12 @@
 import { createFileRoute } from '@tanstack/react-router';
 
-export const Route = createFileRoute('/organizer/dashboard')({
+export const Route = createFileRoute('/organizer/events/')({
 	staticData: {
-		title: 'Dashboard',
+		title: 'Events',
 	},
 	component: RouteComponent,
 });
 
 function RouteComponent() {
-	return <div>Hello "/organizer/dashboard"!</div>;
+	return <div>This is the events page</div>;
 }

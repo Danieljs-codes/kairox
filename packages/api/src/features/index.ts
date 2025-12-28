@@ -1,6 +1,7 @@
 import type { RouterClient } from '@orpc/server';
 
 import { publicProcedure } from '../index';
+import { eventRouter } from './events/event.router';
 import { organizerRouter } from './organizers/organizer.router';
 import { paymentRouter } from './payments/payment.router';
 
@@ -10,6 +11,7 @@ export const appRouter = {
 	}),
 	organizer: organizerRouter,
 	payment: paymentRouter,
+	event: eventRouter,
 };
 export type AppRouter = typeof appRouter;
 export type AppRouterClient = RouterClient<typeof appRouter>;

@@ -21,7 +21,7 @@ export function getOrganizerProfile(db: DB, deps: { id: string }) {
 			() =>
 				db.query.organizer.findFirst({
 					where: { ownerId: deps.id },
-					columns: { id: true },
+					columns: { id: true, name: true },
 				}),
 			(error) => new DatabaseError(error),
 		);

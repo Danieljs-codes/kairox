@@ -16,6 +16,8 @@ import { Route as PageRouteImport } from './routes/page'
 import { Route as OrganizerDashboardRouteImport } from './routes/organizer/dashboard'
 import { Route as authSignUpRouteImport } from './routes/(auth)/sign-up'
 import { Route as authSignInRouteImport } from './routes/(auth)/sign-in'
+import { Route as OrganizerEventsPageRouteImport } from './routes/organizer/events/page'
+import { Route as OrganizerEventsIdCreateEventRouteImport } from './routes/organizer/events/$id/create-event'
 
 const BecomeOrganizerRoute = BecomeOrganizerRouteImport.update({
   id: '/become-organizer',
@@ -51,6 +53,17 @@ const authSignInRoute = authSignInRouteImport.update({
   path: '/sign-in',
   getParentRoute: () => authLayoutRoute,
 } as any)
+const OrganizerEventsPageRoute = OrganizerEventsPageRouteImport.update({
+  id: '/events/',
+  path: '/events/',
+  getParentRoute: () => OrganizerLayoutRoute,
+} as any)
+const OrganizerEventsIdCreateEventRoute =
+  OrganizerEventsIdCreateEventRouteImport.update({
+    id: '/events/$id/create-event',
+    path: '/events/$id/create-event',
+    getParentRoute: () => OrganizerLayoutRoute,
+  } as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof PageRoute
@@ -59,6 +72,8 @@ export interface FileRoutesByFullPath {
   '/sign-in': typeof authSignInRoute
   '/sign-up': typeof authSignUpRoute
   '/organizer/dashboard': typeof OrganizerDashboardRoute
+  '/organizer/events': typeof OrganizerEventsPageRoute
+  '/organizer/events/$id/create-event': typeof OrganizerEventsIdCreateEventRoute
 }
 export interface FileRoutesByTo {
   '/': typeof PageRoute
@@ -67,6 +82,8 @@ export interface FileRoutesByTo {
   '/sign-in': typeof authSignInRoute
   '/sign-up': typeof authSignUpRoute
   '/organizer/dashboard': typeof OrganizerDashboardRoute
+  '/organizer/events': typeof OrganizerEventsPageRoute
+  '/organizer/events/$id/create-event': typeof OrganizerEventsIdCreateEventRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -77,6 +94,8 @@ export interface FileRoutesById {
   '/(auth)/sign-in': typeof authSignInRoute
   '/(auth)/sign-up': typeof authSignUpRoute
   '/organizer/dashboard': typeof OrganizerDashboardRoute
+  '/organizer/events/': typeof OrganizerEventsPageRoute
+  '/organizer/events/$id/create-event': typeof OrganizerEventsIdCreateEventRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -87,6 +106,8 @@ export interface FileRouteTypes {
     | '/sign-in'
     | '/sign-up'
     | '/organizer/dashboard'
+    | '/organizer/events'
+    | '/organizer/events/$id/create-event'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
@@ -95,6 +116,8 @@ export interface FileRouteTypes {
     | '/sign-in'
     | '/sign-up'
     | '/organizer/dashboard'
+    | '/organizer/events'
+    | '/organizer/events/$id/create-event'
   id:
     | '__root__'
     | '/'
@@ -104,6 +127,8 @@ export interface FileRouteTypes {
     | '/(auth)/sign-in'
     | '/(auth)/sign-up'
     | '/organizer/dashboard'
+    | '/organizer/events/'
+    | '/organizer/events/$id/create-event'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -164,6 +189,20 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof authSignInRouteImport
       parentRoute: typeof authLayoutRoute
     }
+    '/organizer/events/': {
+      id: '/organizer/events/'
+      path: '/events'
+      fullPath: '/organizer/events'
+      preLoaderRoute: typeof OrganizerEventsPageRouteImport
+      parentRoute: typeof OrganizerLayoutRoute
+    }
+    '/organizer/events/$id/create-event': {
+      id: '/organizer/events/$id/create-event'
+      path: '/events/$id/create-event'
+      fullPath: '/organizer/events/$id/create-event'
+      preLoaderRoute: typeof OrganizerEventsIdCreateEventRouteImport
+      parentRoute: typeof OrganizerLayoutRoute
+    }
   }
 }
 
@@ -183,10 +222,14 @@ const authLayoutRouteWithChildren = authLayoutRoute._addFileChildren(
 
 interface OrganizerLayoutRouteChildren {
   OrganizerDashboardRoute: typeof OrganizerDashboardRoute
+  OrganizerEventsPageRoute: typeof OrganizerEventsPageRoute
+  OrganizerEventsIdCreateEventRoute: typeof OrganizerEventsIdCreateEventRoute
 }
 
 const OrganizerLayoutRouteChildren: OrganizerLayoutRouteChildren = {
   OrganizerDashboardRoute: OrganizerDashboardRoute,
+  OrganizerEventsPageRoute: OrganizerEventsPageRoute,
+  OrganizerEventsIdCreateEventRoute: OrganizerEventsIdCreateEventRoute,
 }
 
 const OrganizerLayoutRouteWithChildren = OrganizerLayoutRoute._addFileChildren(

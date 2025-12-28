@@ -14,12 +14,14 @@ import {
 	useSidebar,
 } from '@/components/ui/sidebar';
 import { cn } from '@/lib/utils';
+import IconArrowDoorOut from '@icons/arrow-door-out.svg';
 import IconCalendarDays from '@icons/calendar-days.svg';
+import IconChevronExpandY from '@icons/chevron-expand-y.svg';
 import IconDashboard from '@icons/dashboard.svg';
 import IconGear from '@icons/gear.svg';
 import IconTicket from '@icons/ticket.svg';
 import IconUser from '@icons/user.svg';
-import IconVault from '@icons/vault.svg';
+import IconVaultFill from '@icons/vault-fill.svg';
 import { Link, type LinkOptions, linkOptions } from '@tanstack/react-router';
 import { Avatar, AvatarFallback, AvatarImage } from '@ui/avatar';
 import {
@@ -75,7 +77,7 @@ const navItems = [
 	},
 	{
 		title: 'Finances',
-		icon: IconVault,
+		icon: IconVaultFill,
 		// @ts-expect-error - Routes still need to be created
 		linkOption: linkOptions({
 			to: '/organizer/finances',
@@ -119,13 +121,10 @@ export function AppSidebar({
 	return (
 		<Sidebar collapsible="icon" {...props}>
 			<SidebarHeader>
-				<div className="flex items-center gap-2 px-2 py-2">
+				<div className="flex items-center justify-start gap-2 px-2 py-2">
 					<Logo
 						classNames={{
-							container: cn(
-								state === 'expanded' || (isMobile && 'px-2'),
-								state === 'collapsed' && 'grid size-6 place-items-center',
-							),
+							container: cn(state === 'expanded' || (isMobile && 'px-2')),
 							icon: 'size-5 text-primary',
 						}}
 						iconOnly={iconOnly}
@@ -213,7 +212,7 @@ export function AppSidebar({
 										</span>
 										<span className="truncate text-muted-foreground text-xs">{email}</span>
 									</div>
-									<IconChevronExpand className="ml-auto size-4" />
+									<IconChevronExpandY className="ml-auto size-4" />
 								</SidebarMenuButton>
 							}
 						/>
@@ -233,7 +232,7 @@ export function AppSidebar({
 							</MenuGroup>
 							<MenuSeparator />
 							<MenuItem variant="destructive">
-								<IconSignOut />
+								<IconArrowDoorOut />
 								Sign out
 							</MenuItem>
 						</MenuPopup>
