@@ -1,19 +1,30 @@
 {
-  "compilerOptions": {
-    "strict": true,
-    "esModuleInterop": true,
-    "jsx": "react-jsx",
-    "target": "ESNext",
-    "module": "ESNext",
-    "moduleResolution": "Bundler",
-    "verbatimModuleSyntax": true,
-    "skipLibCheck": true,
-    "types": ["vite/client", "vite-plugin-svg-sprite/typings/react"],
-    "rootDirs": ["."],
-    "paths": {
-      "@icons/*": ["./src/components/icons/*"],
-      "@ui/*": ["./src/components/ui/*"],
-      "@/*": ["./src/*"],
-    }
-  }
+	"compilerOptions": {
+		"strict": true,
+		"esModuleInterop": true,
+		"jsx": "react-jsx",
+		"target": "ESNext",
+		"module": "ESNext",
+		"moduleResolution": "Bundler",
+		"verbatimModuleSyntax": true,
+		"skipLibCheck": true,
+		"types": [
+			"vite-plugin-svg-sprite/typings/react",
+			"vite/client",
+		],
+		"rootDirs": [
+			"."
+		],
+		"paths": {
+			"@icons/*": [
+				"./src/components/icons/*"
+			],
+			"@ui/*": [
+				"./src/components/ui/*"
+			],
+			"@/*": [
+				"./src/*"
+			]
+		}
+	}
 }

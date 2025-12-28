@@ -9,11 +9,24 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
+import { Route as BecomeOrganizerRouteImport } from './routes/become-organizer'
+import { Route as OrganizerLayoutRouteImport } from './routes/organizer/layout'
 import { Route as authLayoutRouteImport } from './routes/(auth)/layout'
 import { Route as PageRouteImport } from './routes/page'
+import { Route as OrganizerDashboardRouteImport } from './routes/organizer/dashboard'
 import { Route as authSignUpRouteImport } from './routes/(auth)/sign-up'
 import { Route as authSignInRouteImport } from './routes/(auth)/sign-in'
 
+const BecomeOrganizerRoute = BecomeOrganizerRouteImport.update({
+  id: '/become-organizer',
+  path: '/become-organizer',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const OrganizerLayoutRoute = OrganizerLayoutRouteImport.update({
+  id: '/organizer',
+  path: '/organizer',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const authLayoutRoute = authLayoutRouteImport.update({
   id: '/(auth)',
   getParentRoute: () => rootRouteImport,
@@ -22,6 +35,11 @@ const PageRoute = PageRouteImport.update({
   id: '/',
   path: '/',
   getParentRoute: () => rootRouteImport,
+} as any)
+const OrganizerDashboardRoute = OrganizerDashboardRouteImport.update({
+  id: '/dashboard',
+  path: '/dashboard',
+  getParentRoute: () => OrganizerLayoutRoute,
 } as any)
 const authSignUpRoute = authSignUpRouteImport.update({
   id: '/sign-up',
@@ -36,36 +54,81 @@ const authSignInRoute = authSignInRouteImport.update({
 
 export interface FileRoutesByFullPath {
   '/': typeof PageRoute
+  '/organizer': typeof OrganizerLayoutRouteWithChildren
+  '/become-organizer': typeof BecomeOrganizerRoute
   '/sign-in': typeof authSignInRoute
   '/sign-up': typeof authSignUpRoute
+  '/organizer/dashboard': typeof OrganizerDashboardRoute
 }
 export interface FileRoutesByTo {
   '/': typeof PageRoute
+  '/organizer': typeof OrganizerLayoutRouteWithChildren
+  '/become-organizer': typeof BecomeOrganizerRoute
   '/sign-in': typeof authSignInRoute
   '/sign-up': typeof authSignUpRoute
+  '/organizer/dashboard': typeof OrganizerDashboardRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof PageRoute
   '/(auth)': typeof authLayoutRouteWithChildren
+  '/organizer': typeof OrganizerLayoutRouteWithChildren
+  '/become-organizer': typeof BecomeOrganizerRoute
   '/(auth)/sign-in': typeof authSignInRoute
   '/(auth)/sign-up': typeof authSignUpRoute
+  '/organizer/dashboard': typeof OrganizerDashboardRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/sign-in' | '/sign-up'
+  fullPaths:
+    | '/'
+    | '/organizer'
+    | '/become-organizer'
+    | '/sign-in'
+    | '/sign-up'
+    | '/organizer/dashboard'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/sign-in' | '/sign-up'
-  id: '__root__' | '/' | '/(auth)' | '/(auth)/sign-in' | '/(auth)/sign-up'
+  to:
+    | '/'
+    | '/organizer'
+    | '/become-organizer'
+    | '/sign-in'
+    | '/sign-up'
+    | '/organizer/dashboard'
+  id:
+    | '__root__'
+    | '/'
+    | '/(auth)'
+    | '/organizer'
+    | '/become-organizer'
+    | '/(auth)/sign-in'
+    | '/(auth)/sign-up'
+    | '/organizer/dashboard'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   PageRoute: typeof PageRoute
   authLayoutRoute: typeof authLayoutRouteWithChildren
+  OrganizerLayoutRoute: typeof OrganizerLayoutRouteWithChildren
+  BecomeOrganizerRoute: typeof BecomeOrganizerRoute
 }
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
+    '/become-organizer': {
+      id: '/become-organizer'
+      path: '/become-organizer'
+      fullPath: '/become-organizer'
+      preLoaderRoute: typeof BecomeOrganizerRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/organizer': {
+      id: '/organizer'
+      path: '/organizer'
+      fullPath: '/organizer'
+      preLoaderRoute: typeof OrganizerLayoutRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/(auth)': {
       id: '/(auth)'
       path: ''
@@ -79,6 +142,13 @@ declare module '@tanstack/react-router' {
       fullPath: '/'
       preLoaderRoute: typeof PageRouteImport
       parentRoute: typeof rootRouteImport
+    }
+    '/organizer/dashboard': {
+      id: '/organizer/dashboard'
+      path: '/dashboard'
+      fullPath: '/organizer/dashboard'
+      preLoaderRoute: typeof OrganizerDashboardRouteImport
+      parentRoute: typeof OrganizerLayoutRoute
     }
     '/(auth)/sign-up': {
       id: '/(auth)/sign-up'
@@ -111,9 +181,23 @@ const authLayoutRouteWithChildren = authLayoutRoute._addFileChildren(
   authLayoutRouteChildren,
 )
 
+interface OrganizerLayoutRouteChildren {
+  OrganizerDashboardRoute: typeof OrganizerDashboardRoute
+}
+
+const OrganizerLayoutRouteChildren: OrganizerLayoutRouteChildren = {
+  OrganizerDashboardRoute: OrganizerDashboardRoute,
+}
+
+const OrganizerLayoutRouteWithChildren = OrganizerLayoutRoute._addFileChildren(
+  OrganizerLayoutRouteChildren,
+)
+
 const rootRouteChildren: RootRouteChildren = {
   PageRoute: PageRoute,
   authLayoutRoute: authLayoutRouteWithChildren,
+  OrganizerLayoutRoute: OrganizerLayoutRouteWithChildren,
+  BecomeOrganizerRoute: BecomeOrganizerRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)

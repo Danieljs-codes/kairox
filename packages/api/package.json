@@ -1,30 +1,33 @@
 {
-  "name": "@kairox/api",
-  "type": "module",
-  "exports": {
-    ".": {
-      "default": "./src/index.ts"
-    },
-    "./*": {
-      "default": "./src/*.ts"
-    }
-  },
-  "scripts": {},
-  "dependencies": {
-    "@orpc/server": "catalog:",
-    "@orpc/client": "catalog:",
-    "@orpc/openapi": "catalog:",
-    "@orpc/zod": "catalog:",
-    "@orpc/experimental-pino": "catalog:",
-    "pino": "catalog:",
-    "hono": "catalog:",
-    "dotenv": "catalog:",
-    "zod": "catalog:",
-    "@kairox/auth": "workspace:*",
-    "@kairox/db": "workspace:*"
-  },
-  "devDependencies": {
-    "typescript": "catalog:",
-    "@kairox/config": "workspace:*"
-  }
+	"name": "@kairox/api",
+	"type": "module",
+	"exports": {
+		".": {
+			"default": "./src/index.ts"
+		},
+		"./*": {
+			"default": "./src/*.ts"
+		}
+	},
+	"scripts": {},
+	"dependencies": {
+		"@kairox/auth": "workspace:*",
+		"@kairox/db": "workspace:*",
+		"@kairox/schema": "workspace:*",
+		"@orpc/client": "catalog:",
+		"@orpc/experimental-pino": "catalog:",
+		"@orpc/openapi": "catalog:",
+		"@orpc/server": "catalog:",
+		"@orpc/zod": "catalog:",
+		"dotenv": "catalog:",
+		"hono": "catalog:",
+		"paystack-sdk": "^3.6.1",
+		"pino": "catalog:",
+		"typescript-result": "^3.5.2",
+		"zod": "catalog:"
+	},
+	"devDependencies": {
+		"@kairox/config": "workspace:*",
+		"typescript": "catalog:"
+	}
 }

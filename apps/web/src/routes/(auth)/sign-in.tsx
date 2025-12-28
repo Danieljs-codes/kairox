@@ -11,6 +11,8 @@ import { Alert, AlertTitle } from '@ui/alert';
 import IconTriangleWarning from '@icons/triangle-warning.svg';
 import { Spinner } from '@ui/spinner';
 import { useNavigate } from '@tanstack/react-router';
+import { orpc } from '@/lib/orpc';
+import { useQueryClient } from '@tanstack/react-query';
 
 export const Route = createFileRoute('/(auth)/sign-in')({
 	component: RouteComponent,
@@ -18,6 +20,7 @@ export const Route = createFileRoute('/(auth)/sign-in')({
 
 function RouteComponent() {
 	const navigate = useNavigate();
+	const queryClient = useQueryClient();
 	const form = useAppForm({
 		defaultValues: {
 			email: '',
@@ -27,21 +30,29 @@ function RouteComponent() {
 		validators: {
 			onDynamic: signInSchema,
 			onSubmitAsync: async ({ value }) => {
-				const { data, error } = await authClient.signIn.email({
+				const { error } = await authClient.signIn.email({
 					email: value.email,
 					password: value.password,
+					fetchOptions: {
+						onSuccess: async ({ data }) => {
+							await queryClient.invalidateQueries(
+								orpc.organizer.getCurrentOrganizerProfile.queryOptions(),
+							);
+
+							toastManager.add({
+								type: 'success',
+								title: 'Welcome back!',
+								description: `Signed in as ${data.user.name}. You're all set!`,
+							});
+
+							navigate({ to: '/' });
+						},
+					},
 				});
 
 				if (error) {
 					return { form: error.message };
 				}
-
-				toastManager.add({
-					type: 'success',
-					title: 'Welcome back!',
-					description: `Signed in as ${data.user.name}. You're all set!`,
-				});
-				navigate({ to: '/' });
 			},
 		},
 	});

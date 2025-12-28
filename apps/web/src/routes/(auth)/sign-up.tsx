@@ -11,6 +11,8 @@ import { Alert, AlertTitle } from '@ui/alert';
 import IconTriangleWarning from '@icons/triangle-warning.svg';
 import { Spinner } from '@ui/spinner';
 import { useNavigate } from '@tanstack/react-router';
+import { useQueryClient } from '@tanstack/react-query';
+import { orpc } from '@/lib/orpc';
 
 export const Route = createFileRoute('/(auth)/sign-up')({
 	component: RouteComponent,
@@ -18,6 +20,7 @@ export const Route = createFileRoute('/(auth)/sign-up')({
 
 function RouteComponent() {
 	const navigate = useNavigate();
+	const queryClient = useQueryClient();
 	const form = useAppForm({
 		defaultValues: {
 			name: '',
@@ -28,22 +31,30 @@ function RouteComponent() {
 		validators: {
 			onDynamic: signUpSchema,
 			onSubmitAsync: async ({ value }) => {
-				const { data, error } = await authClient.signUp.email({
+				const { error } = await authClient.signUp.email({
 					name: value.name,
 					email: value.email,
 					password: value.password,
+					fetchOptions: {
+						onSuccess: async ({ data }) => {
+							await queryClient.invalidateQueries(
+								orpc.organizer.getCurrentOrganizerProfile.queryOptions(),
+							);
+
+							toastManager.add({
+								type: 'success',
+								title: 'Welcome to Kairox!',
+								description: `Account created for ${data.user.name}. You're all set!`,
+							});
+
+							navigate({ to: '/' });
+						},
+					},
 				});
 
 				if (error) {
 					return { form: error.message };
 				}
-
-				toastManager.add({
-					type: 'success',
-					title: 'Welcome to Kairox!',
-					description: `Account created for ${data.user.name}. You're all set!`,
-				});
-				navigate({ to: '/' });
 			},
 		},
 	});

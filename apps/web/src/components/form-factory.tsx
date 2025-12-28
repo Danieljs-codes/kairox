@@ -62,7 +62,9 @@ export function TextareaField({
 				value={field.state.value}
 			/>
 			{description && <FieldDescription>{description}</FieldDescription>}
-			<FieldError match={!field.state.meta.isValid}>{field.state.meta.errors[0]}</FieldError>
+			<FieldError match={!field.state.meta.isValid}>
+				{field.state.meta.errors[0].message}
+			</FieldError>
 		</Field>
 	);
 }

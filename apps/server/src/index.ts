@@ -1,11 +1,12 @@
-import 'dotenv/config';
 import { createContext } from '@kairox/api/context';
-import { appRouter } from '@kairox/api/routers/index';
+import { appRouter } from '@kairox/api/features/index';
+import { paystack } from '@kairox/api/lib/paystack';
 import { auth } from '@kairox/auth';
+import { db } from '@kairox/db';
 import { LoggingHandlerPlugin } from '@orpc/experimental-pino';
 import { onError } from '@orpc/server';
-import { RPCHandler } from '@orpc/server/fetch';
-import { CompressionPlugin } from '@orpc/server/fetch';
+import { CompressionPlugin, RPCHandler } from '@orpc/server/fetch';
+import 'dotenv/config';
 import { Hono } from 'hono';
 import { cors } from 'hono/cors';
 import pino from 'pino';
@@ -59,7 +60,11 @@ app.use('/*', async (c, next) => {
 
 	const { matched, response } = await rpcHandler.handle(c.req.raw, {
 		prefix: '/rpc',
-		context: context,
+		context: {
+			...context,
+			db,
+			paystack,
+		},
 	});
 
 	if (matched) {
@@ -68,7 +73,7 @@ app.use('/*', async (c, next) => {
 	}
 
 	await next();
-});
+})
 
 app.get('/', (c) => {
 	return c.text('OK');

@@ -1,12 +1,14 @@
-import type { QueryClient } from '@tanstack/react-query';
-import { AnchoredToastProvider, ToastProvider } from '@ui/toast';
-import { ReactQueryDevtoolsPanel } from '@tanstack/react-query-devtools';
-import { FormDevtoolsPanel } from '@tanstack/react-form-devtools';
-import { HeadContent, Outlet, createRootRouteWithContext } from '@tanstack/react-router';
-import { TanStackRouterDevtoolsPanel } from '@tanstack/react-router-devtools';
-import { TanStackDevtools } from '@tanstack/react-devtools';
 import { ThemeProvider } from '@/components/theme-provider';
+import { getFlashCookie } from '@/lib/cookie';
 import { orpc } from '@/lib/orpc';
+import { TanStackDevtools } from '@tanstack/react-devtools';
+import { FormDevtoolsPanel } from '@tanstack/react-form-devtools';
+import type { QueryClient } from '@tanstack/react-query';
+import { ReactQueryDevtoolsPanel } from '@tanstack/react-query-devtools';
+import { createRootRouteWithContext, HeadContent, Outlet } from '@tanstack/react-router';
+import { TanStackRouterDevtoolsPanel } from '@tanstack/react-router-devtools';
+import { AnchoredToastProvider, toastManager, ToastProvider } from '@ui/toast';
+import { useEffect } from 'react';
 import styles from '../styles/index.css?url';
 
 export interface RouterAppContext {
@@ -45,9 +47,29 @@ export const Route = createRootRouteWithContext<RouterAppContext>()({
 			{ rel: 'manifest', href: '/site.webmanifest' },
 		],
 	}),
+	loader: () => {
+		const cookie = getFlashCookie();
+
+		return { cookie };
+	},
 });
 
 function RootComponent() {
+	const { cookie } = Route.useLoaderData();
+
+	useEffect(() => {
+		if (!cookie) {
+			return;
+		}
+		setTimeout(
+			() =>
+				toastManager.add({
+					...cookie,
+				}),
+			0,
+		);
+	}, [cookie]);
+
 	return (
 		<>
 			<HeadContent />

@@ -28,9 +28,9 @@ export const auth = betterAuth({
 			generateId: () => Bun.randomUUIDv7(),
 		},
 		defaultCookieAttributes: {
-			sameSite: 'none',
-			secure: true,
-			httpOnly: true,
+			sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'lax',
+			secure: process.env.NODE_ENV === 'production',
+			httpOnly: process.env.NODE_ENV === 'production',
 		},
 	},
 });

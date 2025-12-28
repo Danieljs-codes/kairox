@@ -1,31 +1,34 @@
 {
-  "name": "@kairox/db",
-  "type": "module",
-  "exports": {
-    ".": {
-      "default": "./src/index.ts"
-    },
-    "./*": {
-      "default": "./src/*.ts"
-    }
-  },
-  "scripts": {
-    "db:push": "drizzle-kit push",
-    "db:generate": "drizzle-kit generate",
-    "db:studio": "drizzle-kit studio",
-    "db:migrate": "drizzle-kit migrate"
-  },
-  "devDependencies": {
-    "@kairox/config": "workspace:*",
-    "@types/pg": "^8.15.6",
-    "drizzle-kit": "^1.0.0-beta.6-4414a19",
-    "typescript": "catalog:"
-  },
-  "dependencies": {
-    "@epic-web/remember": "^1.1.0",
-    "dotenv": "catalog:",
-    "drizzle-orm": "^1.0.0-beta.6-4414a19",
-    "pg": "^8.16.3",
-    "zod": "catalog:"
-  }
+	"name": "@kairox/db",
+	"type": "module",
+	"exports": {
+		".": {
+			"default": "./src/index.ts"
+		},
+		"./schema": {
+			"default": "./src/schema/index.ts"
+		},
+		"./*": {
+			"default": "./src/*.ts"
+		}
+	},
+	"scripts": {
+		"db:push": "drizzle-kit push",
+		"db:generate": "drizzle-kit generate",
+		"db:studio": "drizzle-kit studio",
+		"db:migrate": "drizzle-kit migrate"
+	},
+	"dependencies": {
+		"@epic-web/remember": "^1.1.0",
+		"dotenv": "catalog:",
+		"drizzle-orm": "^1.0.0-beta.6-4414a19",
+		"pg": "^8.16.3",
+		"zod": "catalog:"
+	},
+	"devDependencies": {
+		"@kairox/config": "workspace:*",
+		"@types/pg": "^8.15.6",
+		"drizzle-kit": "^1.0.0-beta.6-4414a19",
+		"typescript": "catalog:"
+	}
 }
