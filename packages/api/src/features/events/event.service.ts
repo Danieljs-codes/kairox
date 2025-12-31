@@ -25,24 +25,21 @@ export function getEventDetails(
 				const event = await db
 					.selectFrom('event')
 					.selectAll('event')
-					.select(
-						(eb) =>
-							[
-								jsonArrayFrom(
-									eb
-										.selectFrom('ticketType')
-										.selectAll('ticketType')
-										.whereRef('ticketType.eventId', '=', 'event.id'),
-								).as('ticketTypes'),
-								jsonArrayFrom(
-									eb
-										.selectFrom('eventBanner')
-										.selectAll('eventBanner')
-										.whereRef('eventBanner.eventId', '=', 'event.id')
-										.orderBy('eventBanner.sortOrder', 'asc'),
-								).as('banners'),
-							] as any,
-					)
+					.select((eb) => [
+						jsonArrayFrom(
+							eb
+								.selectFrom('ticketType')
+								.selectAll('ticketType')
+								.whereRef('ticketType.eventId', '=', 'event.id'),
+						).as('ticketTypes'),
+						jsonArrayFrom(
+							eb
+								.selectFrom('eventBanner')
+								.selectAll('eventBanner')
+								.whereRef('eventBanner.eventId', '=', 'event.id')
+								.orderBy('eventBanner.sortOrder', 'asc'),
+						).as('banners'),
+					])
 					.where('event.id', '=', deps.eventId)
 					.where('event.organizerId', '=', deps.organizerId)
 					.executeTakeFirst();
@@ -107,6 +104,19 @@ export function saveEventDetails(
 						timezone: deps.data.timezone,
 						venueAddress: deps.data.address,
 					})
+					.onConflict(oc =>
+						oc
+							.column('id')
+							.doUpdateSet({
+								title: (eb) => eb.ref('excluded.title'),
+								slug: (eb) => eb.ref('excluded.slug'),
+								description: (eb) => eb.ref('excluded.description'),
+								startDate: (eb) => eb.ref('excluded.startDate'),
+								endDate: (eb) => eb.ref('excluded.endDate'),
+								timezone: (eb) => eb.ref('excluded.timezone'),
+								venueAddress: (eb) => eb.ref('excluded.venueAddress'),
+							}),
+					)
 					.returning(['id as eventId'])
 					.executeTakeFirst();
 			},
