@@ -66,7 +66,7 @@ export const EventDetails = () => {
 
 				toastManager.add({
 					title: 'Success',
-					description: 'Event details saved successfully',
+					description: 'Details saved successfully. Continue to next step.',
 					type: 'success',
 				});
 			},
@@ -74,7 +74,7 @@ export const EventDetails = () => {
 				if (!isDefinedError(error)) {
 					toastManager.add({
 						title: 'Error',
-						description: 'Failed to save event details',
+						description: 'Failed to save. Please try again.',
 						type: 'error',
 					});
 					return;
@@ -473,7 +473,7 @@ export const EventDetails = () => {
 				children={([isSubmitting]) => (
 					<Button type="submit" disabled={isSubmitting} size="lg">
 						{isSubmitting && <Spinner />}
-						{isSubmitting ? 'Saving...' : 'Save'}
+						{isSubmitting ? 'Continuing...' : 'Continue'}
 					</Button>
 				)}
 			/>
