@@ -1,21 +1,20 @@
-export class DatabaseError extends Error {
-	readonly type = 'database-error';
-	constructor(cause?: unknown) {
-		super('Database operation failed');
-		this.cause = cause;
-	}
-}
+import { CommonError, type CommonError as TCommonError } from '../../common.errors';
 
-export class OrganizerNotFoundError extends Error {
-	readonly type = 'organizer-not-found-error';
-	constructor(public readonly organizerId: string) {
-		super(`Organizer with ID ${organizerId} not found.`);
-	}
-}
+export type OrganizerError =
+	| TCommonError
+	| { _type: 'ORGANIZER_NOT_FOUND_ERROR'; organizerId: string }
+	| { _type: 'ORGANIZER_ALREADY_EXISTS_ERROR'; userId: string };
 
-export class OrganizerAlreadyExistsError extends Error {
-	readonly type = 'organizer-already-exists-error';
-	constructor(public readonly userId: string) {
-		super(`User ${userId} already has an organizer profile.`);
-	}
-}
+export const OrganizerError = {
+	...CommonError,
+
+	notFound: (organizerId: string): OrganizerError => ({
+		_type: 'ORGANIZER_NOT_FOUND_ERROR',
+		organizerId,
+	}),
+
+	alreadyExists: (userId: string): OrganizerError => ({
+		_type: 'ORGANIZER_ALREADY_EXISTS_ERROR',
+		userId,
+	}),
+};

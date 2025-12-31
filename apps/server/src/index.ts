@@ -73,7 +73,7 @@ app.use('/*', async (c, next) => {
 	}
 
 	await next();
-})
+});
 
 app.get('/', (c) => {
 	return c.text('OK');

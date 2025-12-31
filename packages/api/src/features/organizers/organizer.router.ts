@@ -1,9 +1,7 @@
 import { becomeOrganizerSchema } from '@kairox/schema/organizer';
 import z from 'zod';
 import { protectedProcedure, publicProcedure } from '../..';
-import { BankAccountVerificationError, PaystackError, PaystackRecipientCreationError } from '../payments/payment.errors';
 import { verifyBankAccount } from '../payments/payment.service';
-import { DatabaseError, OrganizerAlreadyExistsError, OrganizerNotFoundError } from './organizer.errors';
 import { createOrganizerProfile, getOrganizerProfile } from './organizer.service';
 
 export const organizerRouter = {
@@ -22,16 +20,15 @@ export const organizerRouter = {
 			const result = await getOrganizerProfile(context.db, { id: context.session.user.id });
 
 			if (!result.ok) {
-				return result
-					.match()
-					.when(OrganizerNotFoundError, () => ({
+				if (result.error._type === 'ORGANIZER_NOT_FOUND_ERROR') {
+					return {
 						session: context.session,
 						organizer: null,
-					}))
-					.when(DatabaseError, () => {
-						throw errors.DATABASE_ERROR();
-					})
-					.run();
+					};
+				}
+				if (result.error._type === 'DATABASE_ERROR') {
+					throw errors.DATABASE_ERROR();
+				}
 			}
 
 			return {
@@ -66,19 +63,16 @@ export const organizerRouter = {
 			});
 
 			if (!result.ok) {
-				return result
-					.match()
-					.when(BankAccountVerificationError, () => {
-						throw errors.BANK_VERIFICATION_ERROR({
-							data: { accountNumber: input.accountNumber, bankCode: input.bankCode },
-						});
-					})
-					.when(PaystackError, (error) => {
-						throw errors.PAYSTACK_ERROR({
-							data: { message: error.message },
-						});
-					})
-					.run();
+				if (result.error._type === 'BANK_ACCOUNT_VERIFICATION_ERROR') {
+					throw errors.BANK_VERIFICATION_ERROR({
+						data: { accountNumber: input.accountNumber, bankCode: input.bankCode },
+					});
+				}
+				if (result.error._type === 'PAYSTACK_ERROR') {
+					throw errors.PAYSTACK_ERROR({
+						data: { message: result.error.message },
+					});
+				}
 			}
 
 			return result.value;
@@ -112,30 +106,27 @@ export const organizerRouter = {
 			});
 
 			if (!result.ok) {
-				return result
-					.match()
-					.when(DatabaseError, () => {
-						throw errors.DATABASE_ERROR();
-					})
-					.when(BankAccountVerificationError, () => {
-						throw errors.BANK_VERIFICATION_ERROR({
-							data: { accountNumber: input.accountNumber, bankCode: input.bankCode },
-						});
-					})
-					.when(PaystackError, (error) => {
-						throw errors.PAYSTACK_ERROR({
-							data: { message: error.message },
-						});
-					})
-					.when(OrganizerAlreadyExistsError, () => {
-						throw errors.ORGANIZER_ALREADY_EXISTS();
-					})
-					.when(PaystackRecipientCreationError, (error) => {
-						throw errors.PAYSTACK_RECIPIENT_CREATION_ERROR({
-							data: { message: error.message },
-						});
-					})
-					.run();
+				if (result.error._type === 'DATABASE_ERROR') {
+					throw errors.DATABASE_ERROR();
+				}
+				if (result.error._type === 'BANK_ACCOUNT_VERIFICATION_ERROR') {
+					throw errors.BANK_VERIFICATION_ERROR({
+						data: { accountNumber: input.accountNumber, bankCode: input.bankCode },
+					});
+				}
+				if (result.error._type === 'PAYSTACK_ERROR') {
+					throw errors.PAYSTACK_ERROR({
+						data: { message: result.error.message },
+					});
+				}
+				if (result.error._type === 'ORGANIZER_ALREADY_EXISTS_ERROR') {
+					throw errors.ORGANIZER_ALREADY_EXISTS();
+				}
+				if (result.error._type === 'PAYSTACK_RECIPIENT_CREATION_ERROR') {
+					throw errors.PAYSTACK_RECIPIENT_CREATION_ERROR({
+						data: { message: result.error.message },
+					});
+				}
 			}
 
 			return result.value;

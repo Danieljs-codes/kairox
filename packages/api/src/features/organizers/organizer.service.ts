@@ -1,36 +1,36 @@
 import { Result } from 'typescript-result';
-import {
-	DatabaseError,
-	OrganizerAlreadyExistsError,
-	OrganizerNotFoundError,
-} from './organizer.errors';
-import type { DB } from '@kairox/db';
-import { organizer } from '@kairox/db/schema';
+import { Kysely } from 'kysely';
+import { OrganizerError } from './organizer.errors';
+import type { Database } from '@kairox/db';
 import type { PaystackClient } from '../../lib/paystack';
+import { PaymentError as PaymentError } from '../payments/payment.errors';
 import { verifyBankAccount } from '../payments/payment.service';
-import { PaystackRecipientCreationError } from '../payments/payment.errors';
 import type { SnakeToCamelObject } from '../../lib/utils';
 
 type BanksResponse = Awaited<ReturnType<PaystackClient['verification']['resolveAccount']>>;
 
 export type VerifyBankAccountResponse = NonNullable<BanksResponse['data']>;
 
-export function getOrganizerProfile(db: DB, deps: { id: string }) {
+export function getOrganizerProfile(db: Kysely<Database>, deps: { id: string }) {
 	return Result.gen(function* () {
-		const org = yield* Result.fromAsyncCatching(
-			() =>
-				db.query.organizer.findFirst({
-					where: { ownerId: deps.id },
-					columns: { id: true, name: true },
-				}),
-			(error) => new DatabaseError(error),
+		const result = yield* Result.fromAsyncCatching(
+			async () => {
+				const org = await db
+					.selectFrom('organizer')
+					.select(['id', 'name'])
+					.where('ownerId', '=', deps.id)
+					.executeTakeFirst();
+
+				return org;
+			},
+			(error) => OrganizerError.database(error),
 		);
 
-		if (!org) {
-			return yield* Result.error(new OrganizerNotFoundError(deps.id));
+		if (!result) {
+			return yield* Result.error(OrganizerError.notFound(deps.id));
 		}
 
-		return org;
+		return result;
 	});
 }
 
@@ -42,22 +42,26 @@ export type CreateOrganizerProfileInput = {
 };
 
 export function createOrganizerProfile(
-	db: DB,
+	db: Kysely<Database>,
 	paystack: PaystackClient,
 	input: CreateOrganizerProfileInput,
 ) {
 	return Result.gen(function* () {
 		const existing = yield* Result.fromAsyncCatching(
-			() =>
-				db.query.organizer.findFirst({
-					where: { ownerId: input.userId },
-					columns: { id: true },
-				}),
-			(error) => new DatabaseError(error),
+			async () => {
+				const org = await db
+					.selectFrom('organizer')
+					.select('id')
+					.where('ownerId', '=', input.userId)
+					.executeTakeFirst();
+
+				return org;
+			},
+			(error) => OrganizerError.database(error),
 		);
 
 		if (existing) {
-			return yield* Result.error(new OrganizerAlreadyExistsError(input.userId));
+			return yield* Result.error(OrganizerError.alreadyExists(input.userId));
 		}
 
 		let bankDetails: SnakeToCamelObject<VerifyBankAccountResponse> | undefined;
@@ -80,16 +84,16 @@ export function createOrganizerProfile(
 						bank_code: input.bankCode!,
 						currency: 'NGN',
 					}),
-				(error) => new PaystackRecipientCreationError('Failed to create recipient', error),
+				(error) => PaymentError.paystackRecipientCreation('Failed to create recipient', error),
 			);
 
 			recipientCode = recipientResult.data?.recipient_code;
 		}
 
 		const newOrganizer = yield* Result.fromAsyncCatching(
-			() =>
-				db
-					.insert(organizer)
+			async () => {
+				const result = await db
+					.insertInto('organizer')
 					.values({
 						ownerId: input.userId,
 						name: input.organizationName,
@@ -98,10 +102,14 @@ export function createOrganizerProfile(
 						accountName: bankDetails?.accountName,
 						paystackRecipientCode: recipientCode,
 					})
-					.returning(),
-			(error) => new DatabaseError(error),
+					.returningAll()
+					.executeTakeFirstOrThrow();
+
+				return result;
+			},
+			(error) => OrganizerError.database(error),
 		);
 
-		return newOrganizer[0];
+		return newOrganizer;
 	});
 }

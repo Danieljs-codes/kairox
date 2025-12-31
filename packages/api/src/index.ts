@@ -26,11 +26,11 @@ const requireAuthenticatedOrganizer = o
 	.$context<OrganizerMiddlewareContext>()
 	.middleware(async ({ context, next }) => {
 		// Get organizer
-		const result = await db.query.organizer.findFirst({
-			where: {
-				ownerId: context.session.user.id,
-			},
-		});
+		const result = await db
+			.selectFrom('organizer')
+			.selectAll()
+			.where('ownerId', '=', context.session.user.id)
+			.executeTakeFirst();
 
 		if (!result) {
 			throw new ORPCError('UNAUTHORIZED');

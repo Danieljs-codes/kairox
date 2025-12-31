@@ -1,18 +1,52 @@
-import { db } from '@kairox/db';
-import * as schema from '@kairox/db/schema/index';
+import { pool } from '@kairox/db';
 import { betterAuth } from 'better-auth';
-import { drizzleAdapter } from 'better-auth/adapters/drizzle';
 
 export const auth = betterAuth({
-	database: drizzleAdapter(db, {
-		provider: 'pg',
-		schema,
-	}),
+	database: pool,
+	user: {
+		fields: {
+			emailVerified: 'email_verified',
+			createdAt: 'created_at',
+			updatedAt: 'updated_at',
+		},
+	},
 	session: {
 		cookieCache: {
 			enabled: true,
 			maxAge: 2 * 60, // 2 Minutes
 		},
+		fields: {
+			userId: 'user_id',
+			expiresAt: 'expires_at',
+			createdAt: 'created_at',
+			updatedAt: 'updated_at',
+			ipAddress: 'ip_address',
+			userAgent: 'user_agent',
+		},
+	},
+	account: {
+		fields: {
+			userId: 'user_id',
+			accountId: 'account_id',
+			providerId: 'provider_id',
+			accessToken: 'access_token',
+			refreshToken: 'refresh_token',
+			idToken: 'id_token',
+			accessTokenExpiresAt: 'access_token_expires_at',
+			refreshTokenExpiresAt: 'refresh_token_expires_at',
+			createdAt: 'created_at',
+			updatedAt: 'updated_at',
+		},
+	},
+	verification: {
+		fields: {
+			expiresAt: 'expires_at',
+			createdAt: 'created_at',
+			updatedAt: 'updated_at',
+		},
+	},
+	experimental: {
+		joins: true,
 	},
 	trustedOrigins: ['http://localhost:3001', 'http://172.20.10.3:3001'],
 	emailAndPassword: {

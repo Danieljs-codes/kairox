@@ -1,17 +1,19 @@
-import { relations } from './schema';
-import { remember } from '@epic-web/remember';
-import { drizzle } from 'drizzle-orm/bun-sql';
+import { CamelCasePlugin, Kysely, PostgresDialect } from 'kysely';
+import { Pool, types } from 'pg';
+import type { DB } from './generated/types';
 
-// Lazy initialization to ensure env vars are loaded before db connection
-function initializeDb() {
-	return remember('db', () => {
-		const dbUrl = process.env.DATABASE_URL || '';
+types.setTypeParser(types.builtins.INT8, (value) => parseInt(value, 10));
 
-		return drizzle(dbUrl, { relations, logger: true });
-	});
-}
+export const pool = new Pool({
+	connectionString: process.env.DATABASE_URL,
+});
 
-// Direct export with lazy initialization on first access
-export const db = initializeDb();
+export const db = new Kysely<Database>({
+	dialect: new PostgresDialect({
+		pool,
+	}),
+	plugins: [new CamelCasePlugin()],
+});
 
-export type DB = typeof db;
+export type Database = DB;
+export type { DB };

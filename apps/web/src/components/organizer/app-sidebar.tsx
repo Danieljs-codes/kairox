@@ -54,7 +54,6 @@ const navItems = [
 	{
 		title: 'Events',
 		icon: IconCalendarDays,
-		// @ts-expect-error - Routes still need to be created
 		linkOption: linkOptions({
 			to: '/organizer/events',
 		}),
@@ -122,13 +121,15 @@ export function AppSidebar({
 		<Sidebar collapsible="icon" {...props}>
 			<SidebarHeader>
 				<div className="flex items-center justify-start gap-2 px-2 py-2">
-					<Logo
-						classNames={{
-							container: cn(state === 'expanded' || (isMobile && 'px-2')),
-							icon: 'size-5 text-primary',
-						}}
-						iconOnly={iconOnly}
-					/>
+					<Link to="/organizer/dashboard">
+						<Logo
+							classNames={{
+								container: cn(state === 'expanded' || (isMobile && 'px-2')),
+								icon: 'size-5 text-primary',
+							}}
+							iconOnly={iconOnly}
+						/>
+					</Link>
 				</div>
 			</SidebarHeader>
 			<SidebarContent>

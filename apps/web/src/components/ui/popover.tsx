@@ -20,12 +20,14 @@ function PopoverPopup({
 	sideOffset = 4,
 	alignOffset = 0,
 	tooltipStyle = false,
+	viewportClassName,
 	...props
 }: PopoverPrimitive.Popup.Props & {
 	side?: PopoverPrimitive.Positioner.Props['side'];
 	align?: PopoverPrimitive.Positioner.Props['align'];
 	sideOffset?: PopoverPrimitive.Positioner.Props['sideOffset'];
 	alignOffset?: PopoverPrimitive.Positioner.Props['alignOffset'];
+	viewportClassName?: string;
 	tooltipStyle?: boolean;
 }) {
 	return (
@@ -54,6 +56,7 @@ function PopoverPopup({
 							tooltipStyle
 								? 'py-1 [--viewport-inline-padding:--spacing(2)]'
 								: 'not-data-transitioning:overflow-y-auto',
+							viewportClassName,
 						)}
 						data-slot="popover-viewport"
 					>
@@ -90,12 +93,12 @@ function PopoverDescription({ className, ...props }: PopoverPrimitive.Descriptio
 }
 
 export {
-	PopoverCreateHandle,
 	Popover,
-	PopoverTrigger,
-	PopoverPopup,
-	PopoverPopup as PopoverContent,
-	PopoverTitle,
-	PopoverDescription,
 	PopoverClose,
+	PopoverPopup as PopoverContent,
+	PopoverCreateHandle,
+	PopoverDescription,
+	PopoverPopup,
+	PopoverTitle,
+	PopoverTrigger,
 };

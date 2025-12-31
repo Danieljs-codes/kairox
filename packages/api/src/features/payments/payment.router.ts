@@ -1,7 +1,6 @@
 import z from 'zod';
 import { publicProcedure } from '../..';
 import { getAllBanks, verifyBankAccount } from './payment.service';
-import { BankAccountVerificationError, PaystackError } from './payment.errors';
 
 export const paymentRouter = {
 	getAllBanks: publicProcedure
@@ -16,16 +15,13 @@ export const paymentRouter = {
 			const result = await getAllBanks(context.paystack);
 
 			if (!result.ok) {
-				return result
-					.match()
-					.when(PaystackError, (error) => {
-						throw errors.PAYSTACK_ERROR({
-							data: {
-								message: error.message,
-							},
-						});
-					})
-					.run();
+				if (result.error._type === 'PAYSTACK_ERROR') {
+					throw errors.PAYSTACK_ERROR({
+						data: {
+							message: result.error.message,
+						},
+					});
+				}
 			}
 
 			return { banks: result.value };
@@ -51,16 +47,13 @@ export const paymentRouter = {
 			});
 
 			if (!result.ok) {
-				return result
-					.match()
-					.when(BankAccountVerificationError, (error) => {
-						throw errors.VERIFICATION_FAILED({
-							data: {
-								message: error.message,
-							},
-						});
-					})
-					.run();
+				if (result.error._type === 'BANK_ACCOUNT_VERIFICATION_ERROR') {
+					throw errors.VERIFICATION_FAILED({
+						data: {
+							message: result.error.message,
+						},
+					});
+				}
 			}
 
 			return result.value;

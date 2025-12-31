@@ -1,6 +1,7 @@
 import type { LoggerContext } from '@orpc/experimental-pino';
 import type { Context as HonoContext } from 'hono';
-import type { DB } from '@kairox/db';
+import { Kysely } from 'kysely';
+import type { Database } from '@kairox/db';
 import { auth } from '@kairox/auth';
 import type { PaystackClient } from './lib/paystack';
 
@@ -9,7 +10,7 @@ export type CreateContextOptions = {
 };
 
 type StaticContext = {
-	db: DB;
+	db: Kysely<Database>;
 	paystack: PaystackClient;
 };
 

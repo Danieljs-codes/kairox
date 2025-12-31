@@ -13,22 +13,25 @@
 		}
 	},
 	"scripts": {
-		"db:push": "drizzle-kit push",
-		"db:generate": "drizzle-kit generate",
-		"db:studio": "drizzle-kit studio",
-		"db:migrate": "drizzle-kit migrate"
+		"db:push": "atlas schema apply --env local --auto-approve",
+		"db:generate": "kysely-codegen --camel-case --type-mapping='{\"bigint\":\"number\"}' --out-file ./src/generated/types.ts",
+		"db:studio": "atlas schema inspect --env local --format '{{ hcl . }}'",
+		"db:migrate": "atlas migrate diff name --dir file://migrations --to file://schema.sql --env local --format '{{ sql . \"  \" }}'",
+		"db:migrate:apply": "atlas migrate apply --dir file://migrations --env local --revisions-schema atlas_schema_revisions",
+		"db:pull-schema": "bun run pull-schema.ts"
 	},
 	"dependencies": {
 		"@epic-web/remember": "^1.1.0",
 		"dotenv": "catalog:",
-		"drizzle-orm": "^1.0.0-beta.6-4414a19",
+		"kysely": "^0.28.0",
 		"pg": "^8.16.3",
 		"zod": "catalog:"
 	},
 	"devDependencies": {
+		"@ariga/atlas": "^1.0.0",
 		"@kairox/config": "workspace:*",
 		"@types/pg": "^8.15.6",
-		"drizzle-kit": "^1.0.0-beta.6-4414a19",
+		"kysely-codegen": "^0.19.0",
 		"typescript": "catalog:"
 	}
 }

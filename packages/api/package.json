@@ -21,8 +21,10 @@
 		"@orpc/zod": "catalog:",
 		"dotenv": "catalog:",
 		"hono": "catalog:",
+		"kysely": "^0.28.0",
 		"paystack-sdk": "^3.6.1",
 		"pino": "catalog:",
+		"ts-pattern": "catalog:",
 		"typescript-result": "^3.5.2",
 		"zod": "catalog:"
 	},

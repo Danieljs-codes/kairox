@@ -208,8 +208,8 @@ body {
 	--tw-prose-quote-borders: var(--color-border);
 	--tw-prose-captions: var(--color-muted-foreground);
 	--tw-prose-code: var(--color-foreground);
-	--tw-prose-pre-code: var(--color-muted);
-	--tw-prose-pre-bg: var(--color-muted);
+	--tw-prose-pre-code: var(--color-foreground);
+	--tw-prose-pre-bg: var(--color-zinc-900);
 	--tw-prose-th-borders: var(--color-border);
 	--tw-prose-td-borders: var(--color-border);
 	--tw-prose-invert-body: var(--color-foreground);
@@ -224,94 +224,10 @@ body {
 	--tw-prose-invert-quote-borders: var(--color-border);
 	--tw-prose-invert-captions: var(--color-muted-foreground);
 	--tw-prose-invert-code: var(--color-foreground);
-	--tw-prose-invert-pre-code: var(--color-muted-foreground);
-	--tw-prose-invert-pre-bg: rgb(0 0 0 / 50%);
+	--tw-prose-invert-pre-code: var(--color-zinc-300);
+	--tw-prose-invert-pre-bg: var(--color-zinc-900);
 	--tw-prose-invert-th-borders: var(--color-border);
 	--tw-prose-invert-td-borders: var(--color-border);
-
-	/* List styles */
-	&:where(:not([data-theme])) {
-		ul {
-			margin-top: 0.75rem;
-			margin-bottom: 0.75rem;
-			padding-inline-start: 1.25rem;
-			@apply list-disc;
-		}
-
-		ol {
-			margin-top: 0.75rem;
-			margin-bottom: 0.75rem;
-			padding-inline-start: 1.25rem;
-			@apply list-decimal;
-		}
-
-		li {
-			margin-top: 0.25rem;
-			margin-bottom: 0.25rem;
-			padding-inline-start: 0.25rem;
-		}
-
-		li>p {
-			margin-top: 0.5rem;
-			margin-bottom: 0.5rem;
-		}
-
-		li>p:first-child {
-			margin-top: 0;
-		}
-
-		li>p:last-child {
-			margin-bottom: 0;
-		}
-
-		ul ul,
-		ul ol,
-		ol ul,
-		ol ol {
-			margin-top: 0.5rem;
-			margin-bottom: 0.5rem;
-		}
-
-		/* Reduce margins for first/last list elements */
-		>ul:first-child,
-		>ol:first-child {
-			margin-top: 0;
-		}
-
-		>ul:last-child,
-		>ol:last-child {
-			margin-bottom: 0;
-		}
-
-		/* Blockquote styles */
-		blockquote {
-			font-weight: 500;
-			font-style: italic;
-			color: var(--tw-prose-quotes);
-			border-inline-start-width: 0.25rem;
-			border-inline-start-color: var(--tw-prose-quote-borders);
-			quotes: '\201C' '\201D' '\2018' '\2019';
-			margin-top: 1.25em;
-			margin-bottom: 1.25em;
-			padding-inline-start: 1em;
-		}
-
-		blockquote p:first-of-type::before {
-			content: open-quote;
-		}
-
-		blockquote p:last-of-type::after {
-			content: close-quote;
-		}
-
-		blockquote strong {
-			color: inherit;
-		}
-
-		blockquote code {
-			color: inherit;
-		}
-	}
 }
 
 input:-webkit-autofill,
@@ -429,7 +345,7 @@ input[data-autocompleted] {
 }
 
 .tiptap p.is-editor-empty:first-child::before {
-	color: var(--muted-foreground);
+	color: color-mix(in oklab, var(--muted-foreground) 72%, transparent);
 	content: attr(data-placeholder);
 	float: left;
 	height: 0;

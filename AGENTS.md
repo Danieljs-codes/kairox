@@ -412,6 +412,49 @@ const result = Result.gen(bookingWorkflow(123, 456));
 - Independent operations (use `Result.all()`)
 - Side effects only (use `.onSuccess()`)
 
+#### Discriminated Unions for Error Handling
+
+When using `Result.gen()`, always wrap success values with `Result.ok()` and errors with `Result.error()`:
+
+```typescript
+// ✅ Correct - Use Result.ok() for success
+export function generateUniqueSlug(db: Kysely<Database>, title: string) {
+  return Result.gen(async function* () {
+    let baseSlug = slugify(title);
+
+    if (!(await slugExists(db, baseSlug))) {
+      return yield* Result.ok(baseSlug);  // Always wrap success
+    }
+
+    // ... retry logic
+
+    return yield* Result.error(          // Always wrap errors
+      new Error(`Failed to generate unique slug after ${maxAttempts} attempts`)
+    );
+  });
+}
+
+// ❌ Incorrect - Direct return without Result.ok()
+export function badExample(db: Kysely<Database>, title: string) {
+  return Result.gen(async function* () {
+    let baseSlug = slugify(title);
+
+    if (!(await slugExists(db, baseSlug))) {
+      return baseSlug;  // Missing Result.ok() wrapper
+    }
+
+    throw new Error("Failed");  // Throwing instead of Result.error()
+  });
+}
+```
+
+**Why this matters:**
+
+- Ensures consistent return types across all Result.gen() functions
+- Maintains discriminated union type safety
+- Allows proper error handling with `.match()` and other Result methods
+- Follows the established patterns in the codebase
+
 #### Error Conversion in Procedures
 
 Convert domain errors to ORPCError at the procedure boundary:
@@ -472,6 +515,22 @@ packages/
 - Routing: TanStack Router
 - Forms: TanStack Form
 
+#### TanStack Query Imperative Methods
+
+When using `queryClient` imperative methods, understand their differences:
+
+| Method            | Returns          | Throws Errors          | Fetches When                         |
+| ----------------- | ---------------- | ---------------------- | ------------------------------------ |
+| `fetchQuery`      | `Promise<TData>` | Yes                    | Data is stale or not cached          |
+| `prefetchQuery`   | `Promise<void>`  | No (silently discards) | Data is stale or not cached          |
+| `ensureQueryData` | `Promise<TData>` | Yes                    | No data in cache (ignores staleTime) |
+
+**Usage guidelines:**
+
+- **`fetchQuery`**: Use when you need to await the result and handle errors (e.g., async validations).
+- **`prefetchQuery`**: Use for SSR hydration where errors should be silent. Errors during SSR won't block rendering since server errors trigger client-side retries anyway.
+- **`ensureQueryData`**: Use in route loaders. Returns data immediately if cached, throws errors for error boundaries, and supports `revalidateIfStale` for background refetches.
+
 ### Utility Functions
 
 - Merge classNames with `cn()` from `@/lib/utils`
@@ -498,4 +557,5 @@ packages/
 - Icons imported as SVG files from `@icons/*` alias
 
 ### Error Messages
-All error messages should be as descriptive and as concise as possible. 
+
+All error messages should be as descriptive and as concise as possible.

@@ -76,7 +76,7 @@ function RouteComponent() {
 			<TooltipProvider delay={200}>
 				<AppSidebar email={profile.session.user.email} organizationName={profile.organizer.name} />
 				<SidebarInset>
-					<header className="flex h-14 items-center justify-between border-b px-4">
+					<header className="flex h-14 items-center justify-between border-b px-4 shrink-0">
 						<div className="flex shrink-0 items-center gap-2">
 							<SidebarTriggerWithTooltip />
 							{routeTitle && (

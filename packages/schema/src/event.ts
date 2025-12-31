@@ -1,45 +1,70 @@
 import z from 'zod';
 
+export const EVENT_DESCRIPTION_MAX_LENGTH = 1000;
+
 export const eventDetailsSchema = z
 	.object({
+		id: z.uuidv7(),
 		title: z
-			.string({ error: 'Title is required' })
-			.min(3, { error: 'Title must be at least 3 characters' })
-			.max(100, { error: 'Title cannot exceed 100 characters' }),
+			.string({ error: 'Please enter a name for your event' })
+			.min(3, { error: 'The event name must be at least 3 characters' })
+			.max(100, { error: 'The event name cannot exceed 100 characters' }),
 
 		slug: z
-			.string({ error: 'Slug is required' })
-			.min(3, { error: 'Slug must be at least 3 characters' })
-			.max(100, { error: 'Slug cannot exceed 100 characters' })
+			.string({ error: 'Please enter a URL slug' })
+			.min(3, { error: 'The slug must be at least 3 characters' })
+			.max(100, { error: 'The slug cannot exceed 100 characters' })
 			.regex(/^[a-z0-9]+(?:-[a-z0-9]+)*$/, {
-				error: 'Slug must be lowercase with hyphens only (e.g., my-event-name)',
-			}),
+				error: 'The slug must be lowercase and contain only letters, numbers, and hyphens',
+			})
+			.nullish(),
 		description: z
 			.string()
-			.max(5000, { error: 'Description cannot exceed 5000 characters' })
+			.max(EVENT_DESCRIPTION_MAX_LENGTH + 3000, {
+				error: `Description cannot exceed ${EVENT_DESCRIPTION_MAX_LENGTH + 3000} characters`,
+			})
 			.optional(),
 		address: z
-			.string({ error: 'Address is required' })
-			.min(1, { error: 'Address is required' })
+			.string({ error: 'Please enter an event address' })
+			.min(1, { error: 'Please enter an event address' })
 			.max(500, { error: 'Address cannot exceed 500 characters' }),
-		startDate: z.nullable(z.coerce.date()).pipe(z.date({ error: 'Start date is required' })),
-		endDate: z.nullable(z.coerce.date()).pipe(z.date({ error: 'End date is required' })),
+		startDate: z.nullable(z.date()).pipe(z.date({ error: 'Please select a start date' })),
+		endDate: z.nullable(z.date()).pipe(z.date({ error: 'Please select an end date' })),
 		timezone: z
-			.nullable(z.string())
-			.pipe(z.string({ error: 'Timezone is required' }).min(1, { error: 'Timezone is required' })),
-		feeBearer: z
-			.nullable(z.enum(['ORGANIZER', 'CUSTOMER']))
-			.pipe(
-				z.enum(['ORGANIZER', 'CUSTOMER'], { error: 'Fee bearer must be ORGANIZER or CUSTOMER' }),
-			),
+			.string({ error: 'Please select a timezone' })
+			.min(1, { error: 'Please select a timezone' }),
 	})
-	.refine((data) => data.endDate > data.startDate, {
-		error: 'End date must be after start date',
-		path: ['endDate'],
-		when(payload) {
-			return eventDetailsSchema.pick({ endDate: true, startDate: true }).safeParse(payload.value)
-				.success;
-		},
+	.superRefine((data, ctx) => {
+		const { startDate, endDate } = data;
+		const now = new Date();
+
+		if (startDate < now) {
+			ctx.addIssue({
+				code: 'custom',
+				message: 'The event start date cannot be in the past',
+				path: ['startDate'],
+			});
+		}
+
+		if (endDate < now) {
+			ctx.addIssue({
+				code: 'custom',
+				message: 'The event end date cannot be in the past',
+				path: ['endDate'],
+			});
+		} else if (endDate.getTime() === startDate.getTime()) {
+			ctx.addIssue({
+				code: 'custom',
+				message: 'The event end time cannot be exactly the same as the start time',
+				path: ['endDate'],
+			});
+		} else if (endDate < startDate) {
+			ctx.addIssue({
+				code: 'custom',
+				message: 'The event end date must be after the start date',
+				path: ['endDate'],
+			});
+		}
 	});
 
 export type EventDetailsInput = z.input<typeof eventDetailsSchema>;

@@ -15,7 +15,7 @@ export const Route = createFileRoute('/organizer/events/$id/create-event')({
 		step: z.enum(['details', 'tickets', 'media', 'publish']).default('details').catch('details'),
 	}),
 	loaderDeps: ({ search }) => ({ ...search }),
-	loader: async ({ context, params }) => {
+	beforeLoad: async ({ context, params }) => {
 		const event = await context.queryClient.fetchQuery(
 			context.orpc.event.getEventDraft.queryOptions({
 				input: {
