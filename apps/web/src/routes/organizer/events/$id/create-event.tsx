@@ -10,12 +10,19 @@ import {
 import { match } from 'ts-pattern';
 import { z } from 'zod';
 
+const STEPS = ['details', 'tickets', 'media', 'publish'] as const;
+
+function canAccessStep(step: (typeof STEPS)[number], hasEventData: boolean) {
+	if (step === 0) return true;
+	return hasEventData;
+}
+
 export const Route = createFileRoute('/organizer/events/$id/create-event')({
 	validateSearch: z.object({
 		step: z.enum(['details', 'tickets', 'media', 'publish']).default('details').catch('details'),
 	}),
 	loaderDeps: ({ search }) => ({ ...search }),
-	beforeLoad: async ({ context, params }) => {
+	beforeLoad: async ({ context, params, search }) => {
 		const event = await context.queryClient.fetchQuery(
 			context.orpc.event.getEventDraft.queryOptions({
 				input: {
@@ -24,7 +31,27 @@ export const Route = createFileRoute('/organizer/events/$id/create-event')({
 			}),
 		);
 
-		return { event };
+		const currentStepIndex = STEPS.indexOf(search.step);
+		const hasEventData = !!event;
+
+		if (!canAccessStep(currentStepIndex, hasEventData)) {
+			const previousStep = STEPS[currentStepIndex - 1];
+			if (previousStep) {
+				context.setFlashCookie({
+					type: 'info',
+					title: 'Complete previous step first',
+					description: `Please complete ${EVENT_CONFIG[previousStep].title.toLowerCase()} before continuing.`,
+				});
+
+				throw context.redirect({
+					to: '/organizer/events/$id/create-event',
+					params: { id: params.id },
+					search: { step: previousStep },
+				});
+			}
+		}
+
+		return { event, step: search.step };
 	},
 	staticData: {
 		title: 'Create Event',
@@ -34,7 +61,7 @@ export const Route = createFileRoute('/organizer/events/$id/create-event')({
 
 const STEPS = ['details', 'tickets', 'media', 'publish'] as const;
 
-const EVENT_CONFIG = {
+export const EVENT_CONFIG = {
 	details: {
 		step: 1,
 		title: 'Event Details',

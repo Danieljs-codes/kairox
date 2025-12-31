@@ -69,6 +69,12 @@ export const EventDetails = () => {
 					description: 'Details saved successfully. Continue to next step.',
 					type: 'success',
 				});
+
+				await router.navigate({
+					to: '/organizer/events/$id/create-event',
+					params: { id: params.id },
+					search: { step: 'tickets' },
+				});
 			},
 			onError: (error) => {
 				if (!isDefinedError(error)) {
@@ -473,7 +479,7 @@ export const EventDetails = () => {
 				children={([isSubmitting]) => (
 					<Button type="submit" disabled={isSubmitting} size="lg">
 						{isSubmitting && <Spinner />}
-						{isSubmitting ? 'Continuing...' : 'Continue'}
+						{isSubmitting ? 'Continuing...' : 'Save and Continue'}
 					</Button>
 				)}
 			/>
