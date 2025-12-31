@@ -1,4 +1,5 @@
 import { EventDetails } from '@/components/organizer/event-details';
+import { setFlashCookie } from '@/lib/cookie';
 import { createFileRoute } from '@tanstack/react-router';
 import {
 	Progress,
@@ -37,13 +38,13 @@ export const Route = createFileRoute('/organizer/events/$id/create-event')({
 		if (!canAccessStep(currentStepIndex, hasEventData)) {
 			const previousStep = STEPS[currentStepIndex - 1];
 			if (previousStep) {
-				context.setFlashCookie({
+				setFlashCookie({
 					type: 'info',
 					title: 'Complete previous step first',
 					description: `Please complete ${EVENT_CONFIG[previousStep].title.toLowerCase()} before continuing.`,
 				});
 
-				throw context.redirect({
+				throw redirect({
 					to: '/organizer/events/$id/create-event',
 					params: { id: params.id },
 					search: { step: previousStep },
@@ -58,8 +59,6 @@ export const Route = createFileRoute('/organizer/events/$id/create-event')({
 	},
 	component: RouteComponent,
 });
-
-const STEPS = ['details', 'tickets', 'media', 'publish'] as const;
 
 export const EVENT_CONFIG = {
 	details: {
