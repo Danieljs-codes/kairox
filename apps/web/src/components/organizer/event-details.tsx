@@ -58,10 +58,14 @@ export const EventDetails = () => {
 	});
 	const { mutateAsync: saveEventDetails } = useMutation(
 		orpc.event.saveEventDetails.mutationOptions({
-			onSuccess: async () => {
+			onSuccess: async (_, __, ___, { client }) => {
 				await router.invalidate({
 					filter: (match) => match.fullPath === fullPath,
 					sync: true,
+				});
+
+				await client.invalidateQueries({
+					queryKey: orpc.event.getEventDraft.key({ input: { id: params.id } }),
 				});
 
 				toastManager.add({
@@ -70,10 +74,12 @@ export const EventDetails = () => {
 					type: 'success',
 				});
 
+				console.log('navigate to media');
+
 				await router.navigate({
 					to: '/organizer/events/$id/create-event',
 					params: { id: params.id },
-					search: { step: 'tickets' },
+					search: { step: 'media' },
 				});
 			},
 			onError: (error) => {

@@ -29,7 +29,7 @@ export const eventRouter = {
 				}
 			}
 
-			return { event: result.value };
+			return { event: result.value ?? null };
 		}),
 	saveEventDetails: organizerProcedure
 		.input(eventDetailsSchema)

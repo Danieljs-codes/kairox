@@ -1,6 +1,6 @@
 import { EventDetails } from '@/components/organizer/event-details';
 import { setFlashCookie } from '@/lib/cookie';
-import { createFileRoute } from '@tanstack/react-router';
+import { createFileRoute, redirect } from '@tanstack/react-router';
 import {
 	Progress,
 	ProgressIndicator,
@@ -11,16 +11,11 @@ import {
 import { match } from 'ts-pattern';
 import { z } from 'zod';
 
-const STEPS = ['details', 'tickets', 'media', 'publish'] as const;
-
-function canAccessStep(step: (typeof STEPS)[number], hasEventData: boolean) {
-	if (step === 0) return true;
-	return hasEventData;
-}
+const STEPS = ['details', 'media', 'tickets', 'publish'] as const;
 
 export const Route = createFileRoute('/organizer/events/$id/create-event')({
 	validateSearch: z.object({
-		step: z.enum(['details', 'tickets', 'media', 'publish']).default('details').catch('details'),
+		step: z.enum(STEPS).default('details').catch('details'),
 	}),
 	loaderDeps: ({ search }) => ({ ...search }),
 	beforeLoad: async ({ context, params, search }) => {
@@ -33,23 +28,31 @@ export const Route = createFileRoute('/organizer/events/$id/create-event')({
 		);
 
 		const currentStepIndex = STEPS.indexOf(search.step);
-		const hasEventData = !!event;
+		const eventData = event?.event;
+		const hasDetails =
+			!!eventData && eventData.title && eventData.startDate && eventData.venueAddress;
+		const hasMedia = !!eventData && eventData.banners && eventData.banners.length > 0;
+		const hasTickets = !!eventData && eventData.ticketTypes && eventData.ticketTypes.length > 0;
 
-		if (!canAccessStep(currentStepIndex, hasEventData)) {
-			const previousStep = STEPS[currentStepIndex - 1];
-			if (previousStep) {
-				setFlashCookie({
-					type: 'info',
-					title: 'Complete previous step first',
-					description: `Please complete ${EVENT_CONFIG[previousStep].title.toLowerCase()} before continuing.`,
-				});
+		const requiredStepIndex = match(currentStepIndex)
+			.with(1, () => (!hasDetails ? 0 : null))
+			.with(2, () => (!hasDetails || !hasMedia ? 1 : null))
+			.with(3, () => (!hasDetails || !hasMedia || !hasTickets ? 2 : null))
+			.otherwise(() => null);
 
-				throw redirect({
-					to: '/organizer/events/$id/create-event',
-					params: { id: params.id },
-					search: { step: previousStep },
-				});
-			}
+		if (requiredStepIndex !== null) {
+			const requiredStep = STEPS[requiredStepIndex];
+			setFlashCookie({
+				type: 'info',
+				title: 'Complete previous step first',
+				description: `Please complete ${EVENT_CONFIG[requiredStep].title.toLowerCase()} before continuing.`,
+			});
+
+			throw redirect({
+				to: '/organizer/events/$id/create-event',
+				params: { id: params.id },
+				search: { step: requiredStep },
+			});
 		}
 
 		return { event, step: search.step };
@@ -66,15 +69,15 @@ export const EVENT_CONFIG = {
 		title: 'Event Details',
 		description: 'Add the basic information about your event',
 	},
-	tickets: {
-		step: 2,
-		title: 'Tickets',
-		description: 'Set up ticket types and pricing',
-	},
 	media: {
-		step: 3,
+		step: 2,
 		title: 'Media',
 		description: 'Upload images and videos for your event',
+	},
+	tickets: {
+		step: 3,
+		title: 'Tickets',
+		description: 'Set up ticket types and pricing',
 	},
 	publish: {
 		step: 4,
@@ -101,8 +104,8 @@ function RouteComponent() {
 			<div>
 				{match(step)
 					.with('details', () => <EventDetails />)
-					.with('tickets', () => <div>Tickets</div>)
 					.with('media', () => <div>Media</div>)
+					.with('tickets', () => <div>Tickets</div>)
 					.with('publish', () => <div>Publish</div>)
 					.exhaustive()}
 			</div>

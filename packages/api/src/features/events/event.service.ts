@@ -55,20 +55,20 @@ export function getEventDetails(
 	});
 }
 
+const database = (cause?: unknown) => ({
+	_type: 'DATABASE_ERROR' as const,
+	cause,
+});
+
+const slugTaken = (slug: string) => ({
+	_type: 'SLUG_ALREADY_TAKEN' as const,
+	slug,
+});
+
 export function saveEventDetails(
 	db: Kysely<Database>,
 	deps: { eventId: string; organizerId: string; data: EventDetailsOutput },
 ) {
-	const database = (cause?: unknown) => ({
-		_type: 'DATABASE_ERROR' as const,
-		cause,
-	});
-
-	const slugTaken = (slug: string) => ({
-		_type: 'SLUG_ALREADY_TAKEN' as const,
-		slug,
-	});
-
 	return Result.gen(function* () {
 		const slug = deps.data.slug;
 
@@ -104,18 +104,16 @@ export function saveEventDetails(
 						timezone: deps.data.timezone,
 						venueAddress: deps.data.address,
 					})
-					.onConflict(oc =>
-						oc
-							.column('id')
-							.doUpdateSet({
-								title: (eb) => eb.ref('excluded.title'),
-								slug: (eb) => eb.ref('excluded.slug'),
-								description: (eb) => eb.ref('excluded.description'),
-								startDate: (eb) => eb.ref('excluded.startDate'),
-								endDate: (eb) => eb.ref('excluded.endDate'),
-								timezone: (eb) => eb.ref('excluded.timezone'),
-								venueAddress: (eb) => eb.ref('excluded.venueAddress'),
-							}),
+					.onConflict((oc) =>
+						oc.column('id').doUpdateSet({
+							title: (eb) => eb.ref('excluded.title'),
+							slug: (eb) => eb.ref('excluded.slug'),
+							description: (eb) => eb.ref('excluded.description'),
+							startDate: (eb) => eb.ref('excluded.startDate'),
+							endDate: (eb) => eb.ref('excluded.endDate'),
+							timezone: (eb) => eb.ref('excluded.timezone'),
+							venueAddress: (eb) => eb.ref('excluded.venueAddress'),
+						}),
 					)
 					.returning(['id as eventId'])
 					.executeTakeFirst();
