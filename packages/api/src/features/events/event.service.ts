@@ -9,16 +9,6 @@ export function getEventDetails(
 	db: Kysely<Database>,
 	deps: { eventId: string; organizerId: string },
 ) {
-	const notFound = (eventId: string) => ({
-		_type: 'EVENT_NOT_FOUND_ERROR' as const,
-		eventId,
-	});
-
-	const database = (cause?: unknown) => ({
-		_type: 'DATABASE_ERROR' as const,
-		cause,
-	});
-
 	return Result.gen(function* () {
 		const result = yield* Result.fromAsyncCatching(
 			async () => {
@@ -46,24 +36,22 @@ export function getEventDetails(
 
 				return event;
 			},
-			(error) => database(error),
+			(cause) => ({
+				_type: 'DATABASE_ERROR' as const,
+				cause,
+			}),
 		);
 
-		if (!result) return yield* Result.error(notFound(deps.eventId));
+		if (!result) {
+			return yield* Result.error({
+				_type: 'EVENT_NOT_FOUND_ERROR' as const,
+				eventId: deps.eventId,
+			});
+		}
 
 		return result;
 	});
 }
-
-const database = (cause?: unknown) => ({
-	_type: 'DATABASE_ERROR' as const,
-	cause,
-});
-
-const slugTaken = (slug: string) => ({
-	_type: 'SLUG_ALREADY_TAKEN' as const,
-	slug,
-});
 
 export function saveEventDetails(
 	db: Kysely<Database>,
@@ -81,10 +69,18 @@ export function saveEventDetails(
 						.where('slug', '=', slug)
 						.where('id', '!=', deps.eventId)
 						.executeTakeFirst(),
-				(error) => database(error),
+				(cause) => ({
+					_type: 'DATABASE_ERROR' as const,
+					cause,
+				}),
 			);
 
-			if (exists) return yield* Result.error(slugTaken(slug));
+			if (exists) {
+				return yield* Result.error({
+					_type: 'SLUG_ALREADY_TAKEN' as const,
+					slug,
+				});
+			}
 		}
 
 		const finalSlug = slug ?? (yield* generateUniqueSlug(db, deps.data.title));
@@ -118,9 +114,52 @@ export function saveEventDetails(
 					.returning(['id as eventId'])
 					.executeTakeFirst();
 			},
-			(error) => database(error),
+			(cause) => ({
+				_type: 'DATABASE_ERROR' as const,
+				cause,
+			}),
 		);
 
 		return result;
+	});
+}
+
+export function validatePreviousStep(
+	db: Kysely<Database>,
+	deps: {
+		eventId: string;
+		organizerId: string;
+	},
+) {
+	return Result.gen(function* () {
+		const event = yield* getEventDetails(db, {
+			eventId: deps.eventId,
+			organizerId: deps.organizerId,
+		});
+
+		if (!event.title || !event.startDate || !event.endDate) {
+			return yield* Result.error({
+				_type: 'PREVIOUS_STEP_INCOMPLETE_ERROR' as const,
+				eventId: deps.eventId,
+			});
+		}
+
+		return event;
+	});
+}
+
+export function updateEventMedia(
+	db: Kysely<Database>,
+	deps: {
+		eventId: string;
+		organizerId: string;
+		bannerImageUrl: string;
+	},
+) {
+	return Result.gen(function* () {
+		yield* validatePreviousStep(db, {
+			eventId: deps.eventId,
+			organizerId: deps.organizerId,
+		});
 	});
 }

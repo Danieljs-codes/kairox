@@ -19,11 +19,13 @@
 		"@orpc/openapi": "catalog:",
 		"@orpc/server": "catalog:",
 		"@orpc/zod": "catalog:",
+		"blurhash": "^2.0.5",
 		"dotenv": "catalog:",
 		"hono": "catalog:",
 		"kysely": "^0.28.0",
 		"paystack-sdk": "^3.6.1",
 		"pino": "catalog:",
+		"sharp": "^0.34.5",
 		"ts-pattern": "catalog:",
 		"typescript-result": "^3.5.2",
 		"zod": "catalog:"

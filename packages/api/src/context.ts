@@ -4,6 +4,7 @@ import { Kysely } from 'kysely';
 import type { Database } from '@kairox/db';
 import { auth } from '@kairox/auth';
 import type { PaystackClient } from './lib/paystack';
+import type { S3Client } from 'bun';
 
 export type CreateContextOptions = {
 	context: HonoContext;
@@ -12,6 +13,7 @@ export type CreateContextOptions = {
 type StaticContext = {
 	db: Kysely<Database>;
 	paystack: PaystackClient;
+	s3: S3Client;
 };
 
 export async function createContext({ context }: CreateContextOptions) {

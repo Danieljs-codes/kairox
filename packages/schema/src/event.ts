@@ -69,3 +69,10 @@ export const eventDetailsSchema = z
 
 export type EventDetailsInput = z.input<typeof eventDetailsSchema>;
 export type EventDetailsOutput = z.output<typeof eventDetailsSchema>;
+
+export const eventMediaSchema = z.object({
+	// The user will provide a file we upload to S3 and store the URL here so we are validating for a URL but the error message should suggest they provide a file or something along those lines.
+	bannerImage: z.url({
+		error: 'Please upload a banner image for your event',
+	}),
+});

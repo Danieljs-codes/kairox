@@ -1,6 +1,7 @@
 import { createContext } from '@kairox/api/context';
 import { appRouter } from '@kairox/api/features/index';
 import { paystack } from '@kairox/api/lib/paystack';
+import { s3 } from '@kairox/api/lib/s3';
 import { auth } from '@kairox/auth';
 import { db } from '@kairox/db';
 import { LoggingHandlerPlugin } from '@orpc/experimental-pino';
@@ -64,6 +65,7 @@ app.use('/*', async (c, next) => {
 			...context,
 			db,
 			paystack,
+			s3,
 		},
 	});
 

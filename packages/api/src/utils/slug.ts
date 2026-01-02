@@ -53,8 +53,6 @@ export function generateUniqueSlug(
 			}
 		}
 
-		return yield* Result.error(
-			database('Failed to generate unique slug after maximum attempts'),
-		);
+		return yield* Result.error(database('Failed to generate unique slug after maximum attempts'));
 	});
 }

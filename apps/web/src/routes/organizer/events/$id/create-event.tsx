@@ -1,3 +1,4 @@
+import { BannerUpload } from '@/components/organizer/banner-upload';
 import { EventDetails } from '@/components/organizer/event-details';
 import { setFlashCookie } from '@/lib/cookie';
 import { createFileRoute, redirect } from '@tanstack/react-router';
@@ -88,10 +89,11 @@ export const EVENT_CONFIG = {
 
 function RouteComponent() {
 	const { step } = Route.useSearch();
+	const { id } = Route.useParams();
 	const currentConfig = EVENT_CONFIG[step];
 	const progress = (currentConfig.step / STEPS.length) * 100;
 	return (
-		<div className="md:max-w-sm mx-auto">
+		<div className="md:max-w-md mx-auto">
 			<Progress value={progress} className="mb-8">
 				<div className="flex items-center justify-between gap-2">
 					<ProgressLabel className="font-medium">{currentConfig.title}</ProgressLabel>
@@ -104,7 +106,7 @@ function RouteComponent() {
 			<div>
 				{match(step)
 					.with('details', () => <EventDetails />)
-					.with('media', () => <div>Media</div>)
+					.with('media', () => <BannerUpload eventId={id} />)
 					.with('tickets', () => <div>Tickets</div>)
 					.with('publish', () => <div>Publish</div>)
 					.exhaustive()}

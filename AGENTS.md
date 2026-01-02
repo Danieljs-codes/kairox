@@ -4,6 +4,10 @@ This file guides agentic coding assistants working in this repository.
 
 ## Commands
 
+### Error Messages
+
+All error messages should be as descriptive and as concise as possible and should provide the next step to the user if possible.
+
 ### Development
 
 - `bun check` - Runs oxlint (type-aware) and oxfmt (format)
@@ -557,5 +561,3 @@ When using `queryClient` imperative methods, understand their differences:
 - Icons imported as SVG files from `@icons/*` alias
 
 ### Error Messages
-
-All error messages should be as descriptive and as concise as possible.

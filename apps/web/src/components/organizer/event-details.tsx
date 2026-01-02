@@ -148,7 +148,7 @@ export const EventDetails = () => {
 			onSubmit={(event) => {
 				event.preventDefault();
 				event.stopPropagation();
-				form.handleSubmit();
+				void form.handleSubmit();
 			}}
 		>
 			<form.AppField
@@ -377,7 +377,7 @@ export const EventDetails = () => {
 						touched={field.state.meta.isTouched}
 					>
 						<FieldLabel>Event slug</FieldLabel>
-						<Group aria-label="Domain input">
+						<Group aria-label="Domain input" className="w-full">
 							<GroupText render={<Label aria-label="Domain" htmlFor="domain" />}>
 								kairox.com/discover
 							</GroupText>
