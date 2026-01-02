@@ -146,6 +146,14 @@ export function useBannerUpload(eventId: string) {
 		});
 	};
 
+	const proceed = async () => {
+		await router.navigate({
+			to: '/organizer/events/$id/create-event',
+			params: { id: params.id },
+			search: { step: 'tickets' },
+		});
+	};
+
 	return {
 		selectedFile,
 		setSelectedFile,
@@ -154,5 +162,6 @@ export function useBannerUpload(eventId: string) {
 		isProcessing,
 		isLoading: isUploading || isProcessing,
 		upload,
+		proceed,
 	};
 }

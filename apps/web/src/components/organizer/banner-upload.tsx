@@ -82,7 +82,7 @@ export function BannerUpload({ eventId }: { eventId: string }) {
 		select: (s) => s.event?.event,
 	});
 
-	const { selectedFile, setSelectedFile, isUploading, isProcessing, isLoading, upload } =
+	const { selectedFile, setSelectedFile, isUploading, isProcessing, isLoading, upload, proceed } =
 		useBannerUpload(eventId);
 
 	const onDrop = (acceptedFiles: File[]) => {
@@ -108,7 +108,11 @@ export function BannerUpload({ eventId }: { eventId: string }) {
 
 	const handleSubmit = (e: React.FormEvent) => {
 		e.preventDefault();
-		upload();
+		if (selectedFile) {
+			upload();
+		} else {
+			proceed();
+		}
 	};
 
 	const banners = eventData?.banners ?? [];
@@ -153,10 +157,16 @@ export function BannerUpload({ eventId }: { eventId: string }) {
 					type="submit"
 					size="lg"
 					className="w-full mt-4"
-					disabled={!selectedFile || isLoading}
+					disabled={isLoading}
 				>
 					{isLoading ? <Spinner /> : <IconImageUpload />}
-					{isUploading ? 'Uploading...' : isProcessing ? 'Processing...' : 'Upload'}
+					{isUploading
+						? 'Uploading...'
+						: isProcessing
+							? 'Processing...'
+							: selectedFile
+								? 'Upload'
+								: 'Continue'}
 				</Button>
 			</form>
 		</div>

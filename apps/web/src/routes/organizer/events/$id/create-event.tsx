@@ -1,5 +1,6 @@
 import { BannerUpload } from '@/components/organizer/banner-upload';
 import { EventDetails } from '@/components/organizer/event-details';
+import { TicketsCreation } from '@/components/organizer/tickets-creation';
 import { setFlashCookie } from '@/lib/cookie';
 import { createFileRoute, redirect } from '@tanstack/react-router';
 import {
@@ -107,7 +108,7 @@ function RouteComponent() {
 				{match(step)
 					.with('details', () => <EventDetails />)
 					.with('media', () => <BannerUpload eventId={id} />)
-					.with('tickets', () => <div>Tickets</div>)
+					.with('tickets', () => <TicketsCreation />)
 					.with('publish', () => <div>Publish</div>)
 					.exhaustive()}
 			</div>
